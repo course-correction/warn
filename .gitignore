@@ -1,0 +1,9 @@
+fcm_credentials.json
+nina_config.json
+nina_id.json
+
+received/
+old/
+__pycache__/
+
+.venv/
