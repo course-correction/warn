@@ -15,7 +15,7 @@ import logging
 from uuid import UUID, uuid4
 import requests
 import json
-from pydantic import BaseModel, Field, AliasPath
+from pydantic import BaseModel, Field, AliasPath, computed_field
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +138,11 @@ class NinaPushMsg(BaseModel):
     provider: str | None = Field(default=None, validation_alias=AliasPath("data", "provider"))
     severity: str | None = Field(default=None, validation_alias=AliasPath("data", "severity"))
     event_code: str | None = Field(default=None, validation_alias=AliasPath("data", "transKeys", "event"))
+    
+    @computed_field
+    @property
+    def link(self) -> str | None:
+        return f"https://warnung.bund.de/meldungen/{self.id}"
 
 
 def parse_push_msg(msg: dict):
@@ -168,7 +173,7 @@ def parse_event(event: dict) -> NinaEvent:
     link = f"https://warnung.bund.de/meldungen/{identifier}"
     
     if "info" in event:
-        for info in event["info"].values():
+        for info in event["info"]:
             if info["language"] not in ["DE", "de-DE"]:
                 continue
             
